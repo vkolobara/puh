@@ -34,6 +34,7 @@ showSalary amount bonus
   | bonus /= 0 = "Salary is " ++ show amount ++ ", and a bonus " ++ show bonus
   | otherwise = "Salary is " ++ show amount
 
+-- Exercise ----------------------
 concat3 s1 s2 s3 
   | length s2 < 2 = s1 ++ s3
   | otherwise = s1 ++ s2 ++ s3
@@ -41,3 +42,4 @@ concat3 s1 s2 s3
 showSalary' amount bonus 
   | amount >= 0 = if bonus /= 0 then show amount ++ ", " ++ show bonus else show amount 
   | otherwise = "Salary is negative!"
+----------------------------------

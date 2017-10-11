@@ -93,9 +93,7 @@ lengths xss = [length xs | xs <- xss]
 doublesFromTo a b | b < a = doublesFromTo b a
                   | otherwise = [x*2 | x <- [a..b]]
 
-
-
-
+caesarCode n xs = [head $ drop ((ord $ toLower x) + n - (ord 'a')) (cycle ['a'..'z']) | x <- xs]
 
 -------------------------------------------------------
 
@@ -116,8 +114,30 @@ camelCase' s = concat [toUpper h : t | (h:t) <- words s]
 
 letterCount s = length $ concat [word | word <- words s, length word > 3]
 
+isPalindrome s | length s < 2 = True
+               | head s == ' ' = True
+               | last s == ' ' = True
+               | (toLower $ head s) == (toLower $ last s) = isPalindrome $ init $ tail s
+               | otherwise = False
 
+flipp xss = concat $ reverse [reverse xs | xs <- xss]
 --------------------------------------------------------------------------
 
+-- Exercise 4 --------------
+inCircle r x y = [(a, b) | a <- [-10..10], b <- [-10..10], (a - x)^2 + (b - x)^2  < r^2 ]
 
--- Dovrsi tuples kod kuce
+steps xs = zip xs $ tail xs 
+
+----------------------------
+
+
+-- Exercise 5 --------------
+indices x xs = [fst ix | ix <- zip [0..] xs, snd ix == x]
+
+showLineNumbers s = unlines [(show $ fst ix) ++ " " ++ snd ix | ix <- (zip [1..] $ lines s)]
+
+haveAlignment xs ys = (length $ common xs ys) > 0
+
+common xs ys = [fst ix | ix <- zip xs ys, fst ix == snd ix]
+
+---------------------------
