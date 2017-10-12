@@ -115,8 +115,8 @@ camelCase' s = concat [toUpper h : t | (h:t) <- words s]
 letterCount s = length $ concat [word | word <- words s, length word > 3]
 
 isPalindrome s | length s < 2 = True
-               | head s == ' ' = True
-               | last s == ' ' = True
+               | head s == ' ' = isPalindrome $ tail s
+               | last s == ' ' = isPalindrome $ init s
                | (toLower $ head s) == (toLower $ last s) = isPalindrome $ init $ tail s
                | otherwise = False
 
