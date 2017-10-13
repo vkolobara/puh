@@ -23,7 +23,8 @@ evaluate x coeffs = sum [fst p * snd p | p <- zip coeffs $ expList x (length coe
 
 -- b)
 factorial :: Double -> Double
-factorial n = product [1..n]
+factorial n | n < 0 = error "Factorial of a negative number"
+            | otherwise = product [1..n]
 
 -- c)
 maclaurin :: [Double]
@@ -31,7 +32,8 @@ maclaurin = [1 / factorial n | n <- [0..]]
 
 -- d)
 exp' :: Double -> Double
-exp' x = evaluate x $ take 170 maclaurin
+expWithN x n = evaluate x $ take n maclaurin
+exp' x = expWithN x 170
 
 -- TASK 3 ----------------------------------------
 
@@ -59,3 +61,41 @@ remove xs key = [item | item <- xs, fst item /= key]
 update :: [(String, a)] -> String -> a -> [(String, a)]
 update xs key value | contains xs key = (key, value) : remove xs key
                     | otherwise       = xs
+
+-- TASK 4 ----------------------------------------
+
+
+retainLettersAndSpaces s = [toLower c | c <- s, isLetter c || isSpace c]
+
+wordFreq :: String -> [(String, Double)]
+wordFreq s = wordFreq' (retainLettersAndSpaces s) []
+
+addToWordFreq w acc = if contains acc w then update acc w $ (lookup' acc w) + 1 else insert' acc (w, 1)
+wordFreq' s acc | null $ ws = acc
+                | otherwise = wordFreq' (unwords $ tail ws) $ addToWordFreq (head ws) acc 
+                where ws = words s
+
+
+keysInBoth :: [(String, a)] -> [(String, a)] -> [String]
+keysInBoth f1 f2 = sort $ nub [fst x1 | x1 <- f1, x2 <- f2, fst x1 == fst x2]
+
+
+
+valueVectorWithKeys freqs keys = [lookup' freqs key | key <- keys] 
+valueVector freqs = [snd freq | freq <- freqs]
+
+cosineSimilarity :: String -> String -> Double
+cosineSimilarity s1 s2 = num / den
+                         where freqs1 = wordFreq s1
+                               freqs2 = wordFreq s2
+                               keys = keysInBoth freqs1 freqs2
+                               commonVec1 = valueVectorWithKeys freqs1 keys 
+                               commonVec2 = valueVectorWithKeys freqs2 keys
+                               num = sum [fst v * snd v | v <- zip commonVec1 commonVec2]
+                               vec1 = valueVector freqs1
+                               vec2 = valueVector freqs2
+                               den1 = sqrt $ sum [v * v | v <- vec1]
+                               den2 = sqrt $ sum [v * v | v <- vec2]
+                               den = den1 * den2
+
+
