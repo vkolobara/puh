@@ -21,10 +21,12 @@ import Data.Char
 {-LECTURE 01-} -- http://www.fer.unizg.hr/_download/repository/puh-2016-lecture-01.lhs
 
 -- EXERCISE 01========================================================================
+ex111 :: String -> String -> String -> String
 ex111 = concat3
 concat3 s1 s2 s3 | length s2 < 2 = s1 ++ s3
                  | otherwise     = s1 ++ s2 ++ s3 
 
+ex112 :: Double -> Double -> String
 ex112 = showSalary
 showSalary amount bonus | amount < 0 = "Amount is negative"
                         | otherwise  = "Salary is " ++ show amount ++ 
@@ -36,23 +38,27 @@ showSalary amount bonus | amount < 0 = "Amount is negative"
 
 -- Define a function that returns a list without the first three elements and
 -- last three elements.
+ex211 :: [a] -> [a]
 ex211 = middleOfList
 middleOfList xs = drop 3 $ take (length xs - 3) xs
 
 -- Define a function 'initals s1 s2' that takes a person's name and a surname 
 -- as input and returns a string consisting of person's initials.
 -- initials "James" "Bond" => "J. B."
+ex212 :: String -> String -> String
 ex212 = initials
 initials s1 s2 = head s1 : ". " ++ head s2 : "."
 
 -- Define a function that concatenates two strings, so that the longest string
 -- always comes first.
+ex213 :: String -> String -> String
 ex213 = concatLongerFirst
 concatLongerFirst s1 s2 | length s1 >= length s2 = s1 ++ s2
                         | otherwise              = concatLongerFirst s2 s1
 
 -- Define a function 'safeHead' that returns an empty list if 'l' is an empty
 -- list, otherwise it returns its first element wrapped inside a singleton list.
+ex214 :: [a] -> [a]
 ex214 = safeHead
 safeHead xs | null xs = []
             | otherwise = [head xs]
@@ -66,6 +72,7 @@ hasDuplicates xs = (length xs) == (length $ nub xs)
 -- EXERCISE 02========================================================================
 
 -- Redefine 'doublesFromTo' so that it also works when b<a.
+ex221 :: (Enum a, Num a, Ord a) => a -> a -> [a]
 ex221 = doublesFromTo
 doublesFromTo a b | a < b     = [x*2 | x <- [a..b]]
                   | otherwise = doublesFromTo b a
@@ -73,6 +80,7 @@ doublesFromTo a b | a < b     = [x*2 | x <- [a..b]]
 -- Redefine 'ceasarCode n xs' so that it shifts all letters a specified number 
 -- of positions 'n', converts all input to lowercase, and ensures that letters 
 -- remain within the ['a'..'z'] interval.
+ex222 :: Int -> String -> String
 ex222 = caesarCode
 caesarRange = ['a'..'z']
 caesarCode n xs = [toLower $ head $ (drop (ord c - ord 'a' + n) $ cycle caesarRange) | c <- xs, c /= ' ']
@@ -85,15 +93,19 @@ caesarCode n xs = [toLower $ head $ (drop (ord c - ord 'a' + n) $ cycle caesarRa
 -- Define 'letterCount' that computes the total number of letters in a string,
 -- thereby ignoring the whitespaces and all words shorter than three letters.
 -- You can use 'totalLength'.
+ex231 :: String -> Int
 ex231 = letterCount
 letterCount s = sum [length w | w <- words s, length w >= 3]
 
 -- Redefine 'isPalindrome' so that it's case insensitive and works correctly 
 -- for strings that contain whitespaces.
+ex232 :: String -> Bool
 ex232 = isPalindrome
 
 -- Removes white spaces and puts chars to lower
+removeWhiteSpaces :: String -> String
 removeWhiteSpaces s = [toLower c | c <- s, c /= ' ']
+
 isPalindrome s =  (removeWhiteSpaces s) == (reverse $ removeWhiteSpaces s)
 
 -- Other variant with recursion
@@ -106,6 +118,7 @@ isPalindrome' s | length s < 2                             = True
 -- Define 'flipp xss' that takes a list of lists, reverts each individual list,
 -- and concatenates all of them, but in the reverse order.
 -- flip ["water","is","warm"] -> "mrawsiretaw"
+ex233 :: [[a]] -> [a]
 ex233 = flipp
 flipp xss = concat $ [reverse xs | xs <- reverse xss]
 
@@ -117,12 +130,15 @@ flipp xss = concat $ [reverse xs | xs <- reverse xss]
 
 -- Redefine the function so that it takes the resolution of the grid as an 
 -- additional argument.
+ex241 :: Double -> Double -> Double -> [(Double, Double)]
 ex241 = inCircle
+inCircleGrid :: Double -> Double -> Double -> [Double] -> [Double] -> [(Double, Double)]
 inCircleGrid r x y gridX gridY = [(a, b) | a <- gridX, b <- gridY, (a - x)^2 + (b - y)^2 <= r^2]
 inCircle r x y = inCircleGrid r x y [-10..10] [-10..10]
 
 -- Define 'steps xs' that, given a list xs=[x1,x2,..], generates the pairs
 -- [(x1,x2),(x2,x3),...]. Hint: have a look at 'pairs5'.
+ex242 :: [a] -> [(a, a)]
 ex242 = steps
 steps xs = zip xs $ tail xs
 
@@ -138,6 +154,7 @@ indices x xs = [fst ix | ix <- zip [0..] xs, snd ix == x]
 -- Define 'showLineNumbers s' that prefixes all lines from string 's' with a
 -- line number.
 -- showLineNumbers "first line\nsecond line" => "1 first line\n2 second line\n"
+ex252 :: String -> String
 ex252 = showLineNumbers
 showLineNumbers s = unlines [(show $ fst ix) ++ " " ++ snd ix | ix <- zip [1..] $ lines s]
 
