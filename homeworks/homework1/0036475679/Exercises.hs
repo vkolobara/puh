@@ -54,7 +54,7 @@ initials s1 s2 = head s1 : ". " ++ head s2 : "."
 ex213 :: String -> String -> String
 ex213 = concatLongerFirst
 concatLongerFirst s1 s2 | length s1 >= length s2 = s1 ++ s2
-                        | otherwise              = concatLongerFirst s2 s1
+                        | otherwise              = s2 ++ s1
 
 -- Define a function 'safeHead' that returns an empty list if 'l' is an empty
 -- list, otherwise it returns its first element wrapped inside a singleton list.
@@ -67,7 +67,7 @@ safeHead xs | null xs = []
 -- duplicate elements (use 'nub').
 ex215 :: Eq a => [a] -> Bool
 ex215 = hasDuplicates
-hasDuplicates xs = (length xs) == (length $ nub xs)
+hasDuplicates xs = (length xs) /= (length $ nub xs)
 
 -- EXERCISE 02========================================================================
 
@@ -83,7 +83,7 @@ doublesFromTo a b | a < b     = [x*2 | x <- [a..b]]
 ex222 :: Int -> String -> String
 ex222 = caesarCode
 caesarRange = ['a'..'z']
-caesarCode n xs = [toLower $ head $ (drop (ord c - ord 'a' + n) $ cycle caesarRange) | c <- xs, c /= ' ']
+caesarCode n xs = [toLower $ head (drop (ord c - ord 'a' + n) $ cycle caesarRange) | c <- xs, c /= ' ']
 -- Explanation: Cycle the allowed caesar range and drop everything up until the current
 -- characters symbol and then drop again n elements so we get the next shifted character
 

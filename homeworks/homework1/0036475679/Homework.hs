@@ -30,9 +30,9 @@ factorial n | n < 0     = error "Factorial of a negative number"
 maclaurin :: [Double]
 maclaurin = [1 / factorial n | n <- [0..]]
 
-exp' :: Double -> Double
+exp :: Double -> Double
 expWithN x n = evaluate x $ take n maclaurin
-exp' x = expWithN x 170
+exp x = expWithN x 170
 
 -- Task 03
 findItem :: [(String, a)] -> String -> [(String, a)]
