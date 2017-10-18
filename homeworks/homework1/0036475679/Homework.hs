@@ -93,12 +93,12 @@ normOfVector vec = sqrt $ sum [ v*v | v<-vec]
 
 cosineSimilarity :: String -> String -> Double
 cosineSimilarity s1 s2 = num / den
-  where freqs1 = wordFreq s1
-        freqs2 = wordFreq s2
-        keys   = commonKeys freqs1 freqs2
-        cVec1  = valueVectorWithKeys freqs1 keys
-        cVec2  = valueVectorWithKeys freqs2 keys
-        num    = sum [fst v * snd v | v <- zip cVec1 cVec2]
-        v1     = valueVector freqs1
-        v2     = valueVector freqs2
-        den    = normOfVector v1 * normOfVector v2
+  where freqs1 = wordFreq s1 -- Word frequencies for the first string
+        freqs2 = wordFreq s2 -- Word frequencies for the second string
+        keys   = commonKeys freqs1 freqs2 -- Get common keys for numerator
+        cVec1  = valueVectorWithKeys freqs1 keys -- Vector of only the common keys
+        cVec2  = valueVectorWithKeys freqs2 keys -- -//-
+        num    = sum [fst v * snd v | v <- zip cVec1 cVec2] -- Calculate numerator
+        v1     = valueVector freqs1 -- Vector of the first frequencies
+        v2     = valueVector freqs2 -- Vector of the second frequnecies
+        den    = normOfVector v1 * normOfVector v2 -- Calculate denumerator
