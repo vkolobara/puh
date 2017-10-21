@@ -19,7 +19,7 @@ leapList = [y | y <- [1996..2017], isLeapYear y]
 evaluate :: Double -> [Double] -> Double
 evaluate x coeffs = sum [fst p * snd p | p <- zip coeffs $ expList x (length coeffs)]
 
--- Get x^i for [0..n]
+-- Get x^i for i in [0..n]
 expList :: Double -> Int -> [Double]
 expList x n = [x^k | k <- [0..n]]
 
