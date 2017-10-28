@@ -64,7 +64,7 @@ ex421 = pad
 pad :: String -> String -> (String, String)
 pad s1 s2 = (padOne $ capitalize s1, padOne $ capitalize s2)
   where capitalize (x:xs) = toUpper x : xs
-        capitalize _      = ""
+        capitalize []     = ""
         l                 = length s1 `max` length s2
         padOne s          = take l (s ++ repeat ' ')
 
