@@ -72,6 +72,7 @@ numberToWords 70 = "seventy"
 numberToWords 80 = "eighty"
 numberToWords 90 = "ninety"
 numberToWords n
+  | n == 0               = "zero"
   | n < 0                = "negative " ++ numberToWords (-n)
   | n `div` 1000000 /= 0 = prefix 1000000 ++ " million" ++ suffix 1000000
   | n `div` 1000 /= 0    = prefix 1000 ++ " thousand" ++ suffix 1000
@@ -79,9 +80,9 @@ numberToWords n
   | n `div` 10   /= 0    = numberToWords (n `div` 10 * 10) ++ "-" ++ numberToWords (n `mod` 10)
   | otherwise            = ""
   where
-    suffix divisor = (if n `mod` divisor == 0 then "" else " ") ++
-                     numberToWords (n `mod` divisor)
-    prefix divisor = numberToWords $ n `div` divisor
+    suffix divisor = (if n `mod` divisor == 0 then "" else " ") ++ -- add space if there are more numbers
+                     numberToWords (n `mod` divisor) -- calculate suffix
+    prefix divisor = numberToWords $ n `div` divisor -- calculate prefix
 
 -- Task 04
 undefined' :: a
