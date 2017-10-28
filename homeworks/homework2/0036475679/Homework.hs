@@ -22,6 +22,26 @@ transform xs = concat [extractChars val chars | (val, chars) <- xs]
   where
     extractChars val chars = [(c, val) | c <- chars]
 
+multiply :: Int -> Int -> Int
+multiply a 0 = 0
+multiply a b 
+  | a < 0     = -multiply (-a) b
+  | b < 0     = -multiply a (-b)
+  | a < b     = multiply b a
+  | otherwise = a + multiply a (b-1)
+
+divide :: Int -> Int -> Int
+divide a 0 = error "division by zero"
+divide a b
+  | a < 0     = -divide (-a) b
+  | b < 0     = -divide a (-b)
+  | a < b     = 0
+  | otherwise = 1 + divide (a-b) b
+
+greatestCD :: Int -> Int -> Int
+greatestCD a 0 = a
+greatestCD a b = greatestCD b $ a `mod` b
+
 -- Task 03
 numberToWords :: Int -> String
 numberToWords 1 = "one"
@@ -52,6 +72,7 @@ numberToWords 70 = "seventy"
 numberToWords 80 = "eighty"
 numberToWords 90 = "ninety"
 numberToWords n
+  | n < 0                = "negative " ++ numberToWords (-n)
   | n `div` 1000000 /= 0 = prefix 1000000 ++ " million" ++ suffix 1000000
   | n `div` 1000 /= 0    = prefix 1000 ++ " thousand" ++ suffix 1000
   | n `div` 100  /= 0    = prefix 100 ++ " hundred" ++ suffix 100
