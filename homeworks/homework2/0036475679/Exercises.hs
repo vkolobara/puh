@@ -104,9 +104,9 @@ ex431 = pad'
 pad' :: String -> String -> (String, String)
 pad' s1 s2 =
   let capitalize (x:xs) = toUpper x : xs
-      capitalize _      = ""
+      capitalize []     = ""
       l                 = length s1 `max` length s2
-      padOne s             = take l (s ++ repeat ' ')
+      padOne s          = take l (s ++ repeat ' ')
   in (padOne $ capitalize s1, padOne $ capitalize s2)
 
 ex432 :: (Integral a, Fractional b) => [a] -> (b, b, b)
@@ -161,7 +161,7 @@ ex512 :: [[a]] -> [a]
 ex512 = headsOf
 headsOf :: [[a]] -> [a]
 headsOf []         = []
-headsOf ([]:_)    = []
+headsOf ([]:xs)    = headsOf xs
 headsOf ((x:_):xs) = x : headsOf xs
 
 -- EXERCISE 02 =======================================================================
@@ -220,7 +220,8 @@ ex541 = drop'
 drop' :: Int -> [a] -> [a]
 drop' 0 xs     = xs
 drop' _ []     = []
-drop' n (_:xs) = drop' (n-1) xs
+drop' n (x:xs) | n < 0     = x:xs 
+               | otherwise = drop' (n-1) xs
 
 ex541' :: Int -> [a] -> [a]
 ex541' = drop''

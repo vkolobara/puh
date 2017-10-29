@@ -14,16 +14,17 @@ nucleotidMapping 'T' = 'A'
 nucleotidMapping 'A' = 'U'
 nucleotidMapping _   = error "No mapping exists"
 
-toRNA s = [nucleotidMapping c | c <- s]
+toRNA s = [nucleotidMapping $ toUpper c | c <- s]
 
 -- Task 02
-transform :: [(Int, String)] -> [(Char, Int)]
-transform xs = concat [extractChars val chars | (val, chars) <- xs]
-  where
-    extractChars val chars = [(c, val) | c <- chars]
+
+--transform :: [(Int, String)] -> [(Char, Int)]
+--transform xs = concat [extractChars val chars | (val, chars) <- xs]
+--  where
+--    extractChars val chars = [(c, val) | c <- chars]
 
 multiply :: Int -> Int -> Int
-multiply a 0 = 0
+multiply _ 0 = 0
 multiply a b 
   | a < 0     = -multiply (-a) b
   | b < 0     = -multiply a (-b)
@@ -31,7 +32,7 @@ multiply a b
   | otherwise = a + multiply a (b-1)
 
 divide :: Int -> Int -> Int
-divide a 0 = error "division by zero"
+divide _ 0 = error "division by zero"
 divide a b
   | a < 0     = -divide (-a) b
   | b < 0     = -divide a (-b)
@@ -44,6 +45,7 @@ greatestCD a b = greatestCD b $ a `mod` b
 
 -- Task 03
 numberToWords :: Int -> String
+-- base cases -----------
 numberToWords 1 = "one"
 numberToWords 2 = "two"
 numberToWords 3 = "three"
@@ -71,6 +73,7 @@ numberToWords 60 = "sixty"
 numberToWords 70 = "seventy"
 numberToWords 80 = "eighty"
 numberToWords 90 = "ninety"
+------------------------------
 numberToWords n
   | n == 0               = "zero"
   | n < 0                = "negative " ++ numberToWords (-n)
@@ -80,7 +83,7 @@ numberToWords n
   | n `div` 10   /= 0    = numberToWords (n `div` 10 * 10) ++ "-" ++ numberToWords (n `mod` 10)
   | otherwise            = ""
   where
-    suffix divisor = (if n `mod` divisor == 0 then "" else " ") ++ -- add space if there are more numbers
+    suffix divisor = (if n `mod` divisor == 0 then "" else " ") ++ -- add space if there is a remainder
                      numberToWords (n `mod` divisor) -- calculate suffix
     prefix divisor = numberToWords $ n `div` divisor -- calculate prefix
 
