@@ -34,6 +34,7 @@ rule90Step (x:y:xs) = y : rule90Step' (x:y:xs)
     rule90Step' (p:x:s:xs) = p `xor` s : rule90Step' (x:s:xs)
     rule90Step' (_:s:xs)   = s         : rule90Step' (s:xs)
     rule90Step' _          = [False] 
+rule90Step (x:xs) = [False]
 
 pretty :: [[Bool]] -> String
 pretty []       = ""
