@@ -21,13 +21,26 @@ transform xs = concat [extractChars val chars | (val, chars) <- xs]
 
 -- Task 03
 rule90 :: [Bool] -> [[Bool]]
-rule90 = undefined
+rule90 xs = xs : rule90' xs
+  where 
+    rule90' ys  = step : rule90' step
+      where step = rule90Step ys
 
 rule90Step :: [Bool] -> [Bool]
-rule90Step = undefined
+rule90Step []     = []
+rule90Step (x:y:xs) = y : rule90Step' (x:y:xs)
+  where
+    rule90Step' []         = []
+    rule90Step' (p:x:s:xs) = p `xor` s : rule90Step' (x:s:xs)
+    rule90Step' (_:s:xs)   = s         : rule90Step' (s:xs)
+    rule90Step' _          = [False] 
 
 pretty :: [[Bool]] -> String
-pretty = undefined
+pretty []       = ""
+pretty (bs:bss) = lineToString bs ++ "\n" ++ pretty bss
+  where boolToChar     False = ' '
+        boolToChar     True  = '#'
+        lineToString bools   = [boolToChar b | b <- bools]
 
 -- Task 04
 f :: [String]
