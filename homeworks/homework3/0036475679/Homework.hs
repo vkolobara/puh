@@ -44,4 +44,22 @@ pretty (bs:bss) = lineToString bs ++ "\n" ++ pretty bss
 
 -- Task 04
 f :: [String]
-f = undefined
+f = "1" : f' "1"
+
+f' s = next : f' next
+  where next = sequenceString s
+
+sequenceString "" = ""
+sequenceString s  = showSequence seq ++ sequenceString rem
+  where (seq, rem) = splitSequence s
+
+splitSequence :: String -> (String, String)
+splitSequence []     = ("", "")
+splitSequence (x:xs) = splitSequence' x (x:xs)
+  where splitSequence' c s = (takeWhile (== c) s, dropWhile (== c) s)
+
+showSequence :: String -> String
+showSequence "" = ""
+showSequence s  = (show $ length s) ++ [head s]
+
+
