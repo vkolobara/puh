@@ -28,13 +28,13 @@ rule90 xs = xs : rule90' xs
 
 rule90Step :: [Bool] -> [Bool]
 rule90Step []     = []
-rule90Step (x:y:xs) = y : rule90Step' (x:y:xs)
+rule90Step xs@(x:y:_) = y : rule90Step' xs
   where
     rule90Step' []         = []
     rule90Step' (p:x:s:xs) = p `xor` s : rule90Step' (x:s:xs)
-    rule90Step' (x:s:xs)   = x         : rule90Step' (s:xs)
-    rule90Step' _          = [False] 
-rule90Step (x:xs) = [False]
+    rule90Step' (x:s:xs)   = [x]
+    rule90Step' _          = [] 
+rule90Step (x:_) = [x]
 
 pretty :: [[Bool]] -> String
 pretty []       = ""
