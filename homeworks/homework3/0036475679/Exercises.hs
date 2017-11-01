@@ -28,8 +28,11 @@ import Data.Char
     length' :: [a] -> Int
 -}
 
+ex611 :: [a] -> Int
 ex611 = length'
-length' = undefined
+length' xs = len xs 0
+  where len []     a = a
+        len (_:xs) a = let acc = 1+a in acc `seq` len xs acc
 
 {-
   1.2
@@ -43,8 +46,17 @@ length' = undefined
 
   - Now write a standard recursive definition (without an accumulator).
 -}
-ex612 = maxUnzip
-maxUnzip = undefined
 
+ex612 :: [(Int, Int)] -> (Int, Int)
+ex612 = maxUnzip
+maxUnzip [] = error "empty list"
+maxUnzip ((a, b):xs) = maxUnzipAcc xs a b
+  where maxUnzipAcc [] maxA maxB          = (a, b) 
+        maxUnzipAcc ((a, b):xs) maxA maxB = (max a maxA, max b maxB)
+
+ex662' :: [(Int, Int)] -> (Int, Int)
 ex662' = maxUnzip'
-maxUnzip' = undefined
+maxUnzip' []          = error "empty list"
+maxUnzip' ((a, b):[]) = (a, b)
+maxUnzip' ((a, b):xs) = (max a maxA, max b maxB)
+  where (maxA, maxB)  = maxUnzip' xs
