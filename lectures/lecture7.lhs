@@ -158,16 +158,25 @@ Define the following functions using partial application of existing functions:
 - Function 'hundredTimes' that takes one element and repeats it 100 times in a
   list.
 
+> takeThree = take 3
+> dropThree = drop 3
+> hundredTimes = replicate 100 
+
 1.2.
 - Define 'index' that indexes the elements in a list:
     index "xyz" => [(0,'x'),(1,'y'),(2,'z')]
 - Define index' in which the index comes at the second position in the pair.
+
+> index = zip [0..]
+> index' xs = zip xs [0..]
 
 1.3.
 - Define 'divider n' that returns a string of length 'n' consisting of
   characters '='.
   divider :: Int -> [Char]
   divider 3 => "==="
+
+> divider n = replicate n '='
 
 === HIGHER-ORDER FUNCTIONS ===================================================
 
