@@ -21,18 +21,18 @@ transform xs = concat [extractChars val chars | (val, chars) <- xs]
 
 -- Task 03
 rule90 :: [Bool] -> [[Bool]]
-rule90 xs = xs : rule90' xs
+rule90 xs = xs : rule90' xs -- Add the first state to output too
   where 
     rule90' ys = step : rule90' step
       where step = rule90Step ys
 
 rule90Step :: [Bool] -> [Bool]
-rule90Step []     = []
-rule90Step xs@(x:y:_) = y : rule90Step' xs
+rule90Step []         = []
+rule90Step xs@(x:y:_) = y : rule90Step' xs -- First edge case : other cases
   where
     rule90Step' []         = []
     rule90Step' (p:x:s:xs) = p `xor` s : rule90Step' (x:s:xs)
-    rule90Step' (x:s:xs)   = [x]
+    rule90Step' (x:s:xs)   = [x] -- second edge case, only 2 elements
     rule90Step' _          = [] 
 rule90Step (x:_) = [x]
 
@@ -60,8 +60,8 @@ sequenceString s  = showSequence seq ++ sequenceString rem
 -- Splits a string at the end of the first sequence
 -- "1122332" -> ("11", "22332")
 splitSequence :: String -> (String, String)
-splitSequence []     = ("", "")
-splitSequence (x:xs) = splitSequence' x (x:xs)
+splitSequence []       = ("", "")
+splitSequence xs@(x:_) = splitSequence' x xs
   where splitSequence' c s = (takeWhile (== c) s, dropWhile (== c) s)
 
 -- Converts a string of a sequence to say what you see
