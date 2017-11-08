@@ -34,7 +34,7 @@ zip' = fix (\rec xs ys -> if null xs || null ys then [] else (head xs, head ys):
 
 -- Task 02
 subsets :: Int -> [a] -> [[a]]
-subsets = undefined
+subsets n = undefined
 
 partitions :: [a] -> [[[a]]]
 partitions = undefined
