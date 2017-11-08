@@ -238,9 +238,9 @@ takeFromTo n1 n2 xs | n1 < 0 || n2 < 0 = error "Indice less than 0"
                     | n2 < n1          = takeFromTo' n2 n1 xs
                     | otherwise        = takeFromTo' n1 n2 xs
   where takeFromTo' 0 e (y:ys) = y : takeFromTo' 0 (e-1) ys
-        takeFromTo' _ 0 (x:_)   = [x]
+        takeFromTo' _ 0 (y:_)   = [y]
         takeFromTo' _ _ []      = []
-        takeFromTo' s e ys    = takeFromTo' (s-1) (e-1) ys
+        takeFromTo' s e (_:ys)    = takeFromTo' (s-1) (e-1) ys
 -- EXERCISE 05 =======================================================================
 
 -- Define a recursive function 'eachThird' that retains every third element
