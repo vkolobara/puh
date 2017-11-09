@@ -33,12 +33,22 @@ zip' :: [a] -> [b] -> [(a, b)]
 zip' = fix (\rec xs ys -> if null xs || null ys then [] else (head xs, head ys):rec (tail xs) (tail ys))
 
 -- Task 02
-subsets :: Int -> [a] -> [[a]]
-subsets n = undefined
+subsets :: Eq a => Int -> [a] -> [[a]]
+subsets n xs
+  | n < 0     = error "n is negative"
+  | otherwise = subsetsAcc n set []
+      where set = nub xs
+
+subsetsAcc :: Int -> [a] -> [a] -> [[a]]
+subsetsAcc 0 _      acc = [acc]
+subsetsAcc n []     _   = []
+subsetsAcc n (x:xs) acc = (subsetsAcc (n-1) xs (x:acc)) ++ (subsetsAcc n xs acc)
+
 
 partitions :: [a] -> [[[a]]]
 partitions = undefined
 
 -- Task 03
-permutations' :: [a] -> [[a]]
-permutations' = undefined
+permutations' :: Eq a => [a] -> [[a]]
+permutations' []     = [[]]
+permutations' xs = [ x:perms | x <- xs, perms <- permutations' (delete x xs)]
