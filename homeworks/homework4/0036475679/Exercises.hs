@@ -163,7 +163,7 @@ sumEvenSquares xs = sum $ map (^2) $ filter (even) xs
 -}
 freq :: Eq a => a -> [a] -> Int
 ex742 = freq
-freq x xs = length $ filter (==x) xs 
+freq x xs = length $ filter (==x)  xs
 
 {-
   4.3.
@@ -174,7 +174,8 @@ freq x xs = length $ filter (==x) xs
 -}
 ex743 :: Eq a => Int -> [a] -> [a]
 ex743 = freqFilter
-freqFilter n =  undefined
+freqFilter n xs = filter p xs
+  where p x = freq x xs >= n 
 
 -- EXERCISE 05 =======================================================================
 {-
@@ -199,7 +200,7 @@ withinInterval n m = filter (\x -> x >= n && x <= m)
 -}
 ex752 :: [[a]] -> [a]
 ex752 = sndColumn
-sndColumn m = otherwise = map (\(_:x:_) -> x) m
+sndColumn m = map (\(_:x:_) -> x) m
 
 {-
   5.3.
