@@ -36,19 +36,25 @@ zip' = fix (\rec xs ys -> if null xs || null ys then [] else (head xs, head ys):
 subsets :: Eq a => Int -> [a] -> [[a]]
 subsets n xs
   | n < 0     = error "n is negative"
-  | otherwise = subsetsAcc n set []
-      where set = nub xs
+  | otherwise = subsets' n $ nub xs
 
-subsetsAcc :: Int -> [a] -> [a] -> [[a]]
-subsetsAcc 0 _      acc = [acc]
-subsetsAcc n []     _   = []
-subsetsAcc n (x:xs) acc = (subsetsAcc (n-1) xs (x:acc)) ++ (subsetsAcc n xs acc)
+subsets' :: Eq a => Int -> [a] -> [[a]]
+subsets' 0 _      = [[]]
+subsets' n []     = []
+subsets' n (x:xs) = [x:p | p <- subsets' (n-1) xs]
+                    ++ [p | p <- subsets' n xs]
 
 
 partitions :: [a] -> [[[a]]]
-partitions = undefined
+partitions []     = error "partitioning empty set"
+partitions xs     = partitions' xs
+
+partitions' :: [a] -> [[[a]]]
+partitions' []     = [[]]
+partitions' (x:xs) = map ([x]:) $ partitions' xs
+                     ++ [map (x:) p | p <- partitions' xs]
 
 -- Task 03
 permutations' :: Eq a => [a] -> [[a]]
 permutations' []     = [[]]
-permutations' xs = [ x:perms | x <- xs, perms <- permutations' (delete x xs)]
+permutations' xs = [ x:perms | x <- xs, perms <- permutations' $ delete x xs]
