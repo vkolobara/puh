@@ -7,8 +7,8 @@ import Data.Ord (comparing)
 -- Composition
 
 --EXERCISES
---sumEven :: [Integer] -> Integer
---sumEven = map snd . filter (even . fst) . zip [0..]
+sumEven :: [Integer] -> Integer
+sumEven = sum . map snd . filter (even . fst) . zip [0..]
 
 
 --filterWords :: [String] -> String -> String
