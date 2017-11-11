@@ -52,7 +52,8 @@ partitions xs     = partitions' xs
 partitions' :: Eq a => [a] -> [[[a]]]
 partitions' []     = [[]]
 partitions' (x:xs) = [([x]:ps) | ps <- parts] ++ [ [(x:p)]++(delete p ps) | ps <- parts, p <- ps]
-  where parts = partitions' xs
+  where parts =  partitions' xs
+
 
 -- Task 03
 permutations' :: Eq a => [a] -> [[a]]
