@@ -45,14 +45,14 @@ subsets' n (x:xs) = [x:p | p <- subsets' (n-1) xs]
                     ++ [p | p <- subsets' n xs]
 
 
-partitions :: [a] -> [[[a]]]
+partitions :: Eq a => [a] -> [[[a]]]
 partitions []     = error "partitioning empty set"
 partitions xs     = partitions' xs
 
-partitions' :: [a] -> [[[a]]]
+partitions' :: Eq a => [a] -> [[[a]]]
 partitions' []     = [[]]
-partitions' (x:xs) = map ([x]:) $ partitions' xs
-                     ++ [map (x:) p | p <- partitions' xs]
+partitions' (x:xs) = [([x]:ps) | ps <- parts] ++ [ [(x:p)]++(delete p ps) | ps <- parts, p <- ps]
+  where parts = partitions' xs
 
 -- Task 03
 permutations' :: Eq a => [a] -> [[a]]
