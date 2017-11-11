@@ -2,8 +2,8 @@
 --
 module Exercises where
 --
-import Data.List
-import Data.Char
+import           Data.Char
+import           Data.List
 --
 
 {-
@@ -72,7 +72,7 @@ divider n = replicate n '='
 -- EXERCISE 02 =======================================================================
 {-
   2.1.
-  - Define 'applyOnLast f xs ys' that applies a binary function 'f' on the last 
+  - Define 'applyOnLast f xs ys' that applies a binary function 'f' on the last
     element of 'xs' and the last element of 'ys'.
     applyOnLast (+) [1,2,3] [5,6] => 9
     applyOnLast max [1,2] [3,4] => 4
@@ -86,7 +86,7 @@ addThree x y z = x + y + z
 ex721 :: (a -> b -> c) -> [a] -> [b] -> c
 ex721 = applyOnLast
 applyOnLast f xs ys = let x = last xs
-                          y = last ys 
+                          y = last ys
                       in f x y
 
 ex721'' :: [Integer] -> [Integer] -> Integer
@@ -129,12 +129,12 @@ listifylist = map (:[])
 
 {-
   3.2.
-  - Define 'cutoff n xs', which cuts off all values from the lists 'xs' at 
+  - Define 'cutoff n xs', which cuts off all values from the lists 'xs' at
     value 'n'.
     cutoff :: Int -> [Int] -> [Int]
     cutoff 100 [20,202,34,117] => [20,100,34,100]
 -}
-cutoff :: Int -> [Int] -> [Int]
+ex732 :: Int -> [Int] -> [Int]
 ex732 = cutoff
 cutoff n = map (min n)
 
@@ -152,7 +152,7 @@ cutoff n = map (min n)
 -}
 ex741 :: [Integer] -> Integer
 ex741 = sumEvenSquares
-sumEvenSquares xs = sum $ map (^2) $ filter (even) xs
+sumEvenSquares xs = sum $ map (^2) $ filter even xs
 
 {-
   4.2.
@@ -175,7 +175,7 @@ freq x xs = length $ filter (==x)  xs
 ex743 :: Eq a => Int -> [a] -> [a]
 ex743 = freqFilter
 freqFilter n xs = filter p xs
-  where p x = freq x xs >= n 
+  where p x = freq x xs >= n
 
 -- EXERCISE 05 =======================================================================
 {-
@@ -200,14 +200,14 @@ withinInterval n m = filter (\x -> x >= n && x <= m)
 -}
 ex752 :: [[a]] -> [a]
 ex752 = sndColumn
-sndColumn m = map (\(_:x:_) -> x) m
+sndColumn = map (\(_:x:_) -> x)
 
 {-
   5.3.
   - Define 'canoinicalizePairs' that takes a list of pairs and returns a list of
     pairs with the order of elements switched so that the first element of the
     pair is smaller than the second one. If the elements are equal, the pair is
-    discarded. 
+    discarded.
     canonicalizePairs :: Ord a => [(a, a)] -> [(a, a)]
     canonicalizePairs [(4,1),(2,2),(1,5)] => [(1,4),(1,5)]
 -}

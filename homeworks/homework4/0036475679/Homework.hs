@@ -1,8 +1,8 @@
 module Homework where
 --
-import Data.List
-import Data.Char
-import Data.Function ( fix )
+import           Data.Char
+import           Data.Function (fix)
+import           Data.List
 --
 
 -- Task 01
@@ -27,7 +27,7 @@ nats :: [Integer]
 nats = fix (\rec x -> x:rec (succ x)) 1
 
 map' :: (a -> b) -> [a] -> [b]
-map' f = fix (\rec xs -> if null xs then [] else (f $ head xs):rec (tail xs))
+map' f = fix (\rec xs -> if null xs then [] else f (head xs):rec (tail xs))
 
 zip' :: [a] -> [b] -> [(a, b)]
 zip' = fix (\rec xs ys -> if null xs || null ys then [] else (head xs, head ys):rec (tail xs) (tail ys))
@@ -42,20 +42,20 @@ subsets' :: Eq a => Int -> [a] -> [[a]]
 subsets' 0 _      = [[]]
 subsets' n []     = []
 subsets' n (x:xs) = [x:p | p <- subsets' (n-1) xs]
-                    ++ [p | p <- subsets' n xs]
+                    ++ subsets' n xs
 
 
 partitions :: Eq a => [a] -> [[[a]]]
-partitions []     = error "partitioning empty set"
-partitions xs     = partitions' xs
+partitions [] = error "partitioning empty set"
+partitions xs = partitions' xs
 
 partitions' :: Eq a => [a] -> [[[a]]]
 partitions' []     = [[]]
-partitions' (x:xs) = [([x]:ps) | ps <- parts] ++ [ [(x:p)]++(delete p ps) | ps <- parts, p <- ps]
+partitions' (x:xs) = [[x]:ps | ps <- parts] ++ [ (x : p) : delete p ps | ps <- parts, p <- ps]
   where parts =  partitions' xs
 
 
 -- Task 03
 permutations' :: Eq a => [a] -> [[a]]
-permutations' []     = [[]]
+permutations' [] = [[]]
 permutations' xs = [ x:perms | x <- xs, perms <- permutations' $ delete x xs]
