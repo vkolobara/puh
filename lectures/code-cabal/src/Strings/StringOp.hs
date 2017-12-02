@@ -1,4 +1,4 @@
-module StringOp 
+module Strings.StringOp 
   ( tokenize
   ) where
 
