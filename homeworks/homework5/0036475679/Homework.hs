@@ -54,10 +54,22 @@ turnRight WEST  = NORTH
 
 -- Task 02
 
-data TriangleType
+data TriangleType = Equilateral | Isosceles | Scalene | Degenerate | Illegal deriving (Eq, Show)
+data Triangel     = Triangle Int Int Int deriving Show
 
 triangleType :: (Ord a, Num a) => a -> a -> a -> TriangleType
-triangleType = undefined
+triangleType a b c
+  | any (<=0) [a,b,c]          = Illegal
+  | (not . all isValid) pairs  = Illegal
+  | any isDegenerate pairs     = Degenerate
+  | a == b && b == c           = Equilateral
+  | numSame <= 2               = Isosceles
+  | numSame == 3               = Scalene
+  | otherwise                  = Illegal
+  where numSame                 = (length . nub) [a,b,c]
+        pairs                   = [((a, b), c), ((a, c), b), ((b, c), a)]
+        isDegenerate ((x,y), z) = x+y == z
+        isValid ((x, y), z)     = x + y >= z
 
 -- Task 03
 
