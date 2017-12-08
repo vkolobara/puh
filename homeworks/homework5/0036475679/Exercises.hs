@@ -2,6 +2,10 @@
 --
 module Exercises where
 --
+import           Data.Char
+import           Data.List
+import           Data.Maybe
+import           Data.Ord
 
 {-
     Here you should provide your solutions to in-class exercises.
@@ -26,14 +30,14 @@ module Exercises where
 
 {-
   1.1.
-  - Define 'sumEven' that adds up elements occurring at even (incl. zero) 
+  - Define 'sumEven' that adds up elements occurring at even (incl. zero)
     positions in a list.
     sumEven :: [Integer] -> Integer
     sumEven [1..10] => 25
 -}
 
 sumEven :: [Integer] -> Integer
-sumEven = undefined
+sumEven = sum . map snd . filter (even . fst) . zip [0..]
 
 {-
   1.2.
@@ -43,7 +47,7 @@ sumEven = undefined
 -}
 
 filterWords :: [String] -> String -> String
-filterWords = undefined
+filterWords ws = unwords . filter (`notElem` ws) . words
 
 {-
   1.3.
@@ -57,7 +61,10 @@ filterWords = undefined
 -}
 
 initials3 :: String -> (String -> Bool) -> String -> String
-initials3 = undefined
+initials3 d p = concatMap ((:d) . toUpper . head) . filter p . words
+
+initials :: String -> String
+initials = initials3 "." (/="")
 
 -- EXERCISE 02 =======================================================================
 {-
@@ -74,18 +81,24 @@ initials3 = undefined
 -}
 
 maxDiff :: [Int] -> Int
-maxDiff = undefined
+maxDiff xs = maximum . map (abs . uncurry (-)) $ zip xs $ tail xs
 
-maxMinDiff = undefined
+maxMinDiff :: [Int] -> (Int, Int)
+maxMinDiff xs = (minimum diff_list, maximum diff_list)
+  where diff_list = map (abs . uncurry (-)) $ zip xs $ tail xs
 
 {-
   2.2.
   - Define 'studentsPassed' that takes as input a list [(NameSurname,Score)] and
-    returns the names of all students who scored at least 50% of the maximum 
+    returns the names of all students who scored at least 50% of the maximum
     score.
 -}
+type NameSurname = String
+type Score = Float
 
-studentsPassed = undefined
+studentsPassed :: [(NameSurname,Score)] -> [NameSurname]
+studentsPassed xs = map fst . filter ((>=m) . snd) $ xs
+  where m = maximum (map snd xs) / 2
 
 -- EXERCISE 03 =======================================================================
 {-
@@ -97,7 +110,7 @@ studentsPassed = undefined
 -}
 
 isTitleCased :: String -> Bool
-isTitleCased = undefined
+isTitleCased = all (isUpper . head) . words
 
 {-
   3.2.
@@ -105,7 +118,8 @@ isTitleCased = undefined
     respect to the second element of a pair.
 -}
 
-sortPairs = undefined
+sortPairs :: (Ord a, Ord b) => [(a,b)] -> [(a,b)]
+sortPairs = sortBy (comparing snd)
 
 {-
   3.3.
@@ -114,8 +128,8 @@ sortPairs = undefined
     filename "/etc/init/cron.conf" => "cron.conf"
 -}
 
-filename :: String -> String
-filename = undefined
+filename :: String ->String
+filename = Data.List.reverse . takeWhile (/='/') . Data.List.reverse
 
 {-
   3.4.
@@ -126,24 +140,31 @@ filename = undefined
 -}
 
 maxElemIndices :: Ord a => [a] -> [Int]
-maxElemIndices = undefined
+maxElemIndices [] = error "empty list"
+maxElemIndices xs = maxElemIndices' 0 m xs
+  where m                         = maximum xs
+        maxElemIndices' _   _  []     = []
+        maxElemIndices' ind el (y:ys) = if y==el then ind:indices else indices
+          where indices = maxElemIndices' (ind+1) el ys
 
 -- EXERCISE 04 =======================================================================
 
 {-
-  4.1. 
+  4.1.
   - Define 'elem'' using 'foldr'.
 -}
 
-elem = undefined
+elem :: Eq a => a -> [a] -> Bool
+elem x = foldr (\y acc -> y==x || acc) False
 
 {-
   4.2.
   - Define 'reverse' using 'foldr'.
 -}
 
-reverse = undefined
-  
+reverse :: [a] -> [a]
+reverse = foldr (\x acc -> acc ++ [x]) []
+
 {-
   4.3.
   - Using 'foldr' define 'nubRuns' that removes consecutively repeated elements
@@ -153,7 +174,7 @@ reverse = undefined
 -}
 
 nubRuns :: Eq a => [a] -> [a]
-nubRuns = undefined
+nubRuns = foldr (\x acc -> if null acc || head acc /= x then x:acc else acc) []
 
 -- EXERCISE 05 =======================================================================
 
@@ -164,18 +185,19 @@ nubRuns = undefined
 -}
 
 reverse' :: [a] -> [a]
-reverse' = undefined
+reverse' = foldl (flip (:)) []
 
 {-
   5.2.
   - Using 'foldl' define function 'sumEven' from problem 1.1.
 -}
 
-sumEven' = undefined
+sumEven' :: [Integer] -> Integer
+sumEven' = fst . foldl (\(curr, flag) x -> if flag then (curr+x, False) else (curr, True)  ) (0,True)
 
 {-
   5.3.
-  - Using 'foldl' define maxUnzip :: [(Int,Int)] -> (Int,Int) 
+  - Using 'foldl' define maxUnzip :: [(Int,Int)] -> (Int,Int)
     that returns the maximum element at first position in a pair and maximum
     element at second position in the pair. In other words, the function should
     be equivalent to:
@@ -184,8 +206,8 @@ sumEven' = undefined
     Return "empty list" error if the list is empty.
 -}
 
-maxUnzip :: [(Int,Int)] -> (Int,Int) 
-maxUnzip = undefined
+maxUnzip :: [(Int,Int)] -> (Int,Int)
+maxUnzip = foldl1 (\(maxX, maxY) (x, y) -> (max x maxX, max y maxY))
 
 
 {-LECTURE 09-} -- http://www.fer.unizg.hr/_download/repository/puh-2016-lecture-09.lhs
@@ -199,8 +221,10 @@ maxUnzip = undefined
     leading zeroes).
     showDate :: Date -> String
 -}
+data Date = Date Int Int Int
 
-showDate = undefined
+showDate :: Date -> String
+showDate (Date d m y) = show d ++ "." ++ show m ++ "." ++ show y
 
 {-
   1.2.
@@ -209,14 +233,18 @@ showDate = undefined
     that translates a shape into the direction of vector (x,y).
 -}
 
-data Point = Point Double Double 
+data Point = Point Double Double
   deriving Show
 
-data Shape2 = Circle2 Point Double | Rectangle2 Point Point 
+data Shape2 = Circle2 Point Double | Rectangle2 Point Point
   deriving Show
 
-translate :: Point -> Shape2 -> Shape2  
-translate = undefined
+translate :: Point -> Shape2 -> Shape2
+translate (Point x y) (Circle2 (Point cx cy) r) =
+  Circle2 (Point (cx+x) (cy+y)) r
+
+translate (Point x y) (Rectangle2 (Point x1 y1) (Point x2 y2)) =
+  Rectangle2 (Point (x+x1) (y+y1)) (Point (x+x2) (y+y2))
 
 {-
   1.3.
@@ -229,21 +257,36 @@ translate = undefined
 -}
 
 inShape :: Shape2 -> Point -> Bool
-inShape = undefined
+inShape (Circle2 (Point x y) r) (Point x1 y1) = (x1-x)^2 + (y1-y)^2 <= r^2
+inShape (Rectangle2 (Point x1 y1) (Point x2 y2)) (Point x y) = x > minX && x < maxX && y > minY && y < maxY
+  where (maxX, minX) = (max x1 x2, min x1 x2)
+        (maxY, minY) = (max y1 y2, min y1 y2)
 
 inShapes :: [Shape2] -> Point -> Bool
-inShapes = undefined
+inShapes shapes p = any (`inShape` p) shapes
 
 {-
   1.4.
-  - Define your type 'Vehicle' that can be a 'Car', 'Truck', 
+  - Define your type 'Vehicle' that can be a 'Car', 'Truck',
     'Motorcycle', or 'Bicycle'. The first three store a name of the manufacturer
     (String) and horsepower (Double).
   - Write a function 'totalHorsepower' that adds up the horsepower of the
     vehicles, assuming that bicycle's horsepower is 0.2.
 -}
 
-totalHorsepower = undefined
+data Vehicle = Car String Double
+             | Truck String Double
+             | Motorcycle String Double
+             | Bicycle deriving Show
+
+horsePower :: Vehicle -> Double
+horsePower (Car _ h)        = h
+horsePower (Truck _ h)      = h
+horsePower (Motorcycle _ h) = h
+horsePower Bicycle          = 0.2
+
+totalHorsepower :: [Vehicle] -> Double
+totalHorsepower = sum . map horsePower
 
 
 -- EXERCISE 02 =======================================================================
@@ -251,11 +294,11 @@ totalHorsepower = undefined
 data Level = Bachelor | Master | PhD deriving (Show, Eq)
 
 data Student = Student
-  { firstName  :: String
-  , lastName   :: String
-  , studentId  :: String
-  , level      :: Level
-  , avgGrade   :: Double
+  { firstName :: String
+  , lastName  :: String
+  , studentId :: String
+  , level     :: Level
+  , avgGrade  :: Double
   } deriving Show
 
 {-
@@ -266,7 +309,8 @@ data Student = Student
 -}
 
 improveStudent :: Student -> Student
-improveStudent = undefined
+improveStudent student = student { avgGrade = newGrade }
+  where newGrade = max 5.0 (1 + avgGrade student)
 
 {-
   2.2.
@@ -276,7 +320,16 @@ improveStudent = undefined
 -}
 
 avgGradePerLevels :: [Student] -> (Double, Double, Double)
-avgGradePerLevels = undefined
+avgGradePerLevels xs = (avgBachelor, avgMaster, avgPhD)
+  where avgBachelor = avgGradePerLevel Bachelor xs
+        avgMaster   = avgGradePerLevel Master   xs
+        avgPhD      = avgGradePerLevel PhD      xs
+
+avgGradePerLevel :: Level -> [Student] -> Double
+avgGradePerLevel lvl = average . map avgGrade . filter ((==lvl) . level)
+
+average :: Fractional a => [a] -> a
+average xs = sum xs / genericLength xs
 
 {-
   2.3.
@@ -286,7 +339,7 @@ avgGradePerLevels = undefined
 -}
 
 rankedStudents :: Level -> [Student] -> [String]
-rankedStudents = undefined
+rankedStudents lvl = map studentId . sortBy (flip (comparing avgGrade)) . filter ((==lvl) . level)
 
 {-
   2.4.
@@ -294,11 +347,14 @@ rankedStudents = undefined
     addStudent :: Student -> [Student] -> [Student]
     that adds a student to a list of students. If a student with an identical
     matriculation number already exists in the list, the function should return an
-    error. 
+    error.
 -}
 
 addStudent :: Student -> [Student] -> [Student]
-addStudent = undefined
+addStudent std students
+  | containsAlready = error "student already exists"
+  | otherwise       = std:students
+  where containsAlready = studentId std `Data.List.elem` map studentId students
 
 -- EXERCISE 03 =======================================================================
 
@@ -306,15 +362,15 @@ addStudent = undefined
   3.1.
   - Define your own parametrized type 'MyTriplet' that contains the values of
     three different types. Do this using a record.
-  - Define a function 
+  - Define a function
     toTriplet :: MyTriplet a b c -> (a, b, c)
     that converts a 'MyTriplet' value into an ordinary triplet.
 -}
 
-data MyTriplet a b c
+data MyTriplet a b c = MyTriplet {a :: a, b :: b, c :: c}
 
 toTriplet :: MyTriplet a b c -> (a, b, c)
-toTriplet = undefined
+toTriplet (MyTriplet a b c) = (a, b, c)
 
 {-
   3.2.
@@ -329,7 +385,8 @@ data Employee = Employee
   } deriving Show
 
 totalSalaries :: [Employee] -> Double
-totalSalaries = undefined
+totalSalaries = sum . map (f . salary)
+  where f = fromMaybe 0
 
 {-
   3.3.
@@ -340,6 +397,13 @@ totalSalaries = undefined
 -}
 
 addStudent2 :: Student -> [Student] -> Maybe [Student]
-addStudent2 = undefined
+addStudent2 std students
+  | containsAlready = Nothing
+  | otherwise       = Just (std:students)
+  where containsAlready = studentId std `Data.List.elem` map studentId students
 
-addStudent3 = undefined
+addStudent3 :: Student -> [Student] -> Either String [Student]
+addStudent3 std students
+  | containsAlready = Left "already exists"
+  | otherwise       = Right (std:students)
+  where containsAlready = studentId std `Data.List.elem` map studentId students
