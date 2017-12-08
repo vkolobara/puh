@@ -1,40 +1,56 @@
 module Homework where
 --
-import Data.List
+import           Data.List
 --
 
 -- Task 01
 
 {-
   Inspect type signatures of functions that you are supposed to implement
-  and and from that information try to think of how Robot and Bearing 
+  and and from that information try to think of how Robot and Bearing
   data types should look like.
 -}
 
-data Robot
-data Bearing 
+data Robot   = Robot { brng  :: Bearing
+                     , coord :: (Integer, Integer) } deriving Show
+data Bearing = NORTH | EAST | SOUTH | WEST deriving Show
 
 mkRobot :: Bearing -> (Integer, Integer) -> Robot
-mkRobot = undefined
+mkRobot = Robot
 
 bearing :: Robot -> Bearing
-bearing = undefined
+bearing (Robot b _) = b
 
 coordinates :: Robot -> (Integer, Integer)
-coordinates = undefined
+coordinates (Robot _ c) = c
 
 {- It is MANDATORY to implement 'simulate' function in terms of fold -}
 simulate :: Robot -> String -> Robot
-simulate = undefined
+simulate = foldl doInstruction
+
+doInstruction :: Robot -> Char -> Robot
+doInstruction r@(Robot b _) 'R' = r {brng=turnRight b}
+doInstruction r@(Robot b _) 'L' = r {brng=turnLeft b}
+doInstruction r@(Robot b c) 'A' = r {coord=advance b c}
+doInstruction _ _               = error "unknown instruction"
 
 advance :: Bearing -> (Integer, Integer) -> (Integer, Integer)
-advance = undefined
+advance NORTH (x,y) = (x,   y+1)
+advance WEST  (x,y) = (x-1, y)
+advance SOUTH (x,y) = (x,   y-1)
+advance EAST  (x,y) = (x+1,   y)
 
 turnLeft :: Bearing -> Bearing
-turnLeft = undefined
+turnLeft NORTH = WEST
+turnLeft WEST  = SOUTH
+turnLeft SOUTH = EAST
+turnLeft EAST  = NORTH
 
 turnRight :: Bearing -> Bearing
-turnRight = undefined
+turnRight NORTH = EAST
+turnRight EAST  = SOUTH
+turnRight SOUTH = WEST
+turnRight WEST  = NORTH
 
 -- Task 02
 
