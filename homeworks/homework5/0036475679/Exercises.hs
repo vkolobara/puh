@@ -81,11 +81,11 @@ initials = initials3 "." (/="")
 -}
 
 maxDiff :: [Int] -> Int
-maxDiff xs = maximum . map (abs . uncurry (-)) $ zip xs $ tail xs
+maxDiff xs = maximum . map (abs . uncurry (-)) $ zip xs (tail xs)
 
 maxMinDiff :: [Int] -> (Int, Int)
 maxMinDiff xs = (minimum diff_list, maximum diff_list)
-  where diff_list = map (abs . uncurry (-)) $ zip xs $ tail xs
+  where diff_list = map (abs . uncurry (-)) $ zip xs (tail xs)
 
 {-
   2.2.
@@ -142,7 +142,7 @@ filename = Data.List.reverse . takeWhile (/='/') . Data.List.reverse
 maxElemIndices :: Ord a => [a] -> [Int]
 maxElemIndices [] = error "empty list"
 maxElemIndices xs = maxElemIndices' 0 m xs
-  where m                         = maximum xs
+  where m                             = maximum xs
         maxElemIndices' _   _  []     = []
         maxElemIndices' ind el (y:ys) = if y==el then ind:indices else indices
           where indices = maxElemIndices' (ind+1) el ys
@@ -258,7 +258,7 @@ translate (Point x y) (Rectangle2 (Point x1 y1) (Point x2 y2)) =
 
 inShape :: Shape2 -> Point -> Bool
 inShape (Circle2 (Point x y) r) (Point x1 y1) = (x1-x)^2 + (y1-y)^2 <= r^2
-inShape (Rectangle2 (Point x1 y1) (Point x2 y2)) (Point x y) = x > minX && x < maxX && y > minY && y < maxY
+inShape (Rectangle2 (Point x1 y1) (Point x2 y2)) (Point x y) = x >= minX && x <= maxX && y >= minY && y <= maxY
   where (maxX, minX) = (max x1 x2, min x1 x2)
         (maxY, minY) = (max y1 y2, min y1 y2)
 
