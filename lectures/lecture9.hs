@@ -59,3 +59,7 @@ avgGradePerLevels' (x:xs) (lvl1, lvl2, lvl3) (cnt1, cnt2, cnt3)
 -- PARAMETRIZED TYPES
 
 -- MAYBE
+
+-- FMAP
+
+
