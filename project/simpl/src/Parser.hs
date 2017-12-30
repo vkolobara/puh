@@ -4,95 +4,171 @@ import Expression
 import Statement
 
 import Control.Monad
-import Text.ParserCombinators.Parsec
-import Text.ParserCombinators.Parsec.Expr
-import Text.ParserCombinators.Parsec.Language
-import qualified Text.ParserCombinators.Parsec.Token as Token
+import Text.ParserCombinators.Parsec hiding (spaces)
 
---parse :: String -> Maybe Statement
---parse = undefined
+import Data.Either
 
-languageDef :: Token.LanguageDef ()
-languageDef = Token.LanguageDef
-  { Token.commentStart    = ""
-  , Token.commentEnd      = ""
-  , Token.commentLine     = ""
-  , Token.nestedComments  = False
-  , Token.identStart      = letter
-  , Token.identLetter     = alphaNum <|> oneOf "_"
-  , Token.opStart         = oneOf ":!#$%^*+./<=>?@\\^"
-  , Token.opLetter        = oneOf ":!#$%^*+./<=>?@\\^"
-  , Token.reservedNames   = [ "if" 
-                            , "else"
-                            , "for"
-                            , "while"
-                            ]
-  , Token.reservedOpNames = [ "+", "-", "*", "/", ":=", "++"
-                            , "<", ">", "<=", ">=", "=="
-                            ]
-  , Token.caseSensitive   = True
-  }
+eitherToMaybe :: Either a b -> Maybe b
+eitherToMaybe = either (const Nothing) (Just)
 
-lexer :: Token.TokenParser()
-lexer = Token.makeTokenParser languageDef
+parse :: String -> Maybe Statement
+parse = eitherToMaybe . Text.ParserCombinators.Parsec.parse parseStatement ""
 
-identifier = Token.identifier lexer
-parens = Token.parens lexer
-braces = Token.braces lexer
-reserved = Token.reserved lexer
-semiSep = Token.semiSep lexer
-reservedOp = Token.reservedOp lexer
-integer = Token.integer lexer
-whiteSpace = Token.whiteSpace lexer
-string = Token.stringLiteral lexer
+spaces :: Parser()
+spaces = skipMany space
 
-operators = [ [Infix (reservedOp "+"  >> return (flip(Op) Plus)) AssocLeft] 
-            , [Infix (reservedOp "*"  >> return (flip(Op) Times)) AssocLeft]  
-            , [Infix (reservedOp "-"  >> return (flip(Op) Minus)) AssocLeft]  
-            , [Infix (reservedOp "/"  >> return (flip(Op) Divide)) AssocLeft]  
-            , [Infix (reservedOp ">"  >> return (flip(Op) Gt)) AssocLeft]  
-            , [Infix (reservedOp ">=" >> return (flip(Op) Ge)) AssocLeft]  
-            , [Infix (reservedOp "<"  >> return (flip(Op) Lt)) AssocLeft]  
-            , [Infix (reservedOp "<=" >> return (flip(Op) Le)) AssocLeft]  
-            , [Infix (reservedOp "==" >> return (flip(Op) Eql)) AssocLeft]  
-            ]
+number :: Parser Int
+number = try negativeNum <|> read <$> many1 digit
 
-expression = buildExpressionParser operators term
+negativeNum :: Parser Int
+negativeNum = do
+  char '-'
+  num <- read <$> many1 digit
+  return (-num)
 
-statement :: Parser Statement
-statement =   parens statement
+word :: Parser String
+word = many1 $ choice [letter, digit]
 
-int :: Parser Int
-int = rd <$> (plus <|> minus <|> number)
-    where rd     = read :: String -> Int
-          plus   = char '+' *> number
-          minus  = (:) <$> char '-' <*> number
-          number = many1 digit
+operator :: Parser String
+operator = choice [try $ string ">=", try $ string "<=", try $ string "==", string "*", string "/"
+                  ,string ">", string "+", string "<", string "-"]
 
-term = parens expression
-     <|> liftM Var identifier
-     <|> liftM Val int
+parseAssignment :: Parser Statement
+parseAssignment = do
+  (Var var) <- parseVariable
+  optional spaces
+  string ":="
+  optional spaces
+  expr <- parseExpression
+  return (Assign var expr)
 
-ifStatement :: Parser Statement
-ifStatement = 
-  do reserved "if"
-     cond <- expression
-     st1 <- braces statement
-     reserved "else"
-     st2 <- braces statement
-     return $ If cond st1 st2
+parseIncr :: Parser Statement
+parseIncr = do
+  (Var var) <- parseVariable
+  string "++"
+  return (Incr var)
 
-whileStatement :: Parser Statement
-whileStatement =
-  do reserved "while"
-     cond <- expression
-     st   <- braces statement
-     return $ While cond st
+parseIf :: Parser Statement
+parseIf = do
+  string "if"
+  optional spaces
+  char '('
+  optional spaces
+  expr <- parseExpression
+  optional spaces
+  char ')'
+  optional spaces
+  char '{'
+  optional spaces
+  ifSt <- parseStatement
+  optional spaces
+  char '}'  
+  optional spaces
+  string "else"
+  optional spaces
+  char '{'
+  optional spaces
+  elSt <- parseStatement
+  optional spaces
+  char '}'
+  return (If expr ifSt elSt)
 
-assignStatement :: Parser Statement
-assignStatement = 
-  do var <- identifier
-     reservedOp ":="
-     expr <- expression
-     return $ Assign var expr
+parseWhile :: Parser Statement
+parseWhile = do
+  string "while"
+  optional spaces
+  char '('
+  optional spaces
+  expr <- parseExpression
+  optional spaces
+  char ')'
+  optional spaces
+  char '{'
+  optional spaces
+  st <- parseStatement
+  optional spaces
+  char '}'
+  return (While expr st)
+  
+parseFor :: Parser Statement
+parseFor = do
+  string "for"
+  optional spaces
+  char '('
+  optional spaces
+  init <- parseStatementNoSeq
+  optional spaces
+  char ';'
+  optional spaces
+  cond <- parseExpression
+  optional spaces
+  char ';'
+  optional spaces
+  upd <- parseStatementNoSeq
+  optional spaces
+  char ')'
+  optional spaces
+  char '{'
+  optional spaces
+  body <- parseStatement
+  optional spaces
+  char '}'
+  return (For init cond upd body)
 
+parseSkip :: Parser Statement
+parseSkip = do
+  string "skip"
+  return Skip
+
+parseSequence :: Parser Statement
+parseSequence = do
+  st1 <- parseStatementNoSeq
+  optional spaces
+  char ';'
+  optional spaces
+  st2 <- parseStatement
+  return (Sequence st1 st2)  
+
+parseStatementNoSeq :: Parser Statement
+parseStatementNoSeq = try parseAssignment <|> try parseIncr <|> try parseIf <|> try parseWhile
+                  <|> try parseFor <|> try parseSkip
+
+parseStatement :: Parser Statement
+parseStatement = try parseSequence <|> parseStatementNoSeq
+
+parseVariable :: Parser Expression
+parseVariable = do
+  var <- word
+  return (Var var)
+  
+parseValue :: Parser Expression
+parseValue = do
+  val <- number
+  return (Val val)
+
+parseOp :: Parser Expression
+parseOp = do
+  e1 <- term
+  optional spaces
+  op <- operator
+  optional spaces
+  e2 <- parseExpression
+  return (Op e1 (stringToBop op) e2)
+
+parseExpression :: Parser Expression
+parseExpression = try parseOp <|> term
+
+term :: Parser Expression
+term = try parseValue <|> parseVariable
+
+stringToBop :: String -> Bop
+stringToBop "+"  = Plus
+stringToBop "-"  = Minus
+stringToBop "*"  = Times
+stringToBop "/"  = Divide
+stringToBop ">"  = Gt
+stringToBop ">=" = Ge
+stringToBop "<"  = Lt
+stringToBop "<=" = Le
+stringToBop "==" = Eql
+stringToBop _    = error "unknown op"
