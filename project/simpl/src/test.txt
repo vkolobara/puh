@@ -1,0 +1,11 @@
+for (i := 0; i < 5; i++) {
+  if (i == 0) {
+    In := In - 10
+  } else { skip };
+  In := In + In
+};
+if (In > 10) {
+  In := 10
+} else {
+  In := 11
+}

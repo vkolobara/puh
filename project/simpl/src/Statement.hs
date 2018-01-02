@@ -31,7 +31,6 @@ desugar (For init cond up st)
     (DWhile cond (DSequence (desugar st) (desugar up)))
 desugar Skip = DSkip
 desugar (Sequence s1 s2) = DSequence (desugar s1) (desugar s2)
-desugar e    = error $ show e
 
 
 evalSimple :: State -> DietStatement -> State

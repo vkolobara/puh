@@ -4,7 +4,7 @@ import Expression
 import Statement
 
 import Control.Monad
-import Text.ParserCombinators.Parsec hiding (spaces)
+import Text.ParserCombinators.Parsec
 
 import Data.Either
 
@@ -13,9 +13,6 @@ eitherToMaybe = either (const Nothing) (Just)
 
 parse :: String -> Maybe Statement
 parse = eitherToMaybe . Text.ParserCombinators.Parsec.parse parseStatement ""
-
-spaces :: Parser()
-spaces = skipMany space
 
 number :: Parser Int
 number = try negativeNum <|> read <$> many1 digit
