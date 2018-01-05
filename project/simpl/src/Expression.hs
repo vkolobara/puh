@@ -5,7 +5,7 @@ data Expression
   = Var String
   | Val Int
   | Op  Expression Bop Expression
-  deriving (Show, Eq)
+  deriving (Show, Read, Eq)
 
 data Bop
   = Plus
@@ -17,7 +17,7 @@ data Bop
   | Lt
   | Le
   | Eql
-  deriving (Show, Eq)
+  deriving (Show, Read, Eq)
 
 type State = String -> Int
 ------------------------------------------

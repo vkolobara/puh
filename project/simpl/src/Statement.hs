@@ -11,7 +11,7 @@ data Statement
   | For      Statement  Expression Statement Statement
   | Sequence Statement  Statement
   | Skip
-  deriving (Show, Eq)
+  deriving (Show, Read, Eq)
 
 data DietStatement
   = DAssign   String     Expression
