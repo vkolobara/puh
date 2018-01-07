@@ -1,4 +1,4 @@
-module Compile where
+module Main where
 
 import Expression
 import Parser
@@ -11,7 +11,7 @@ import Data.Maybe
 main :: IO ()
 main = do
   args <- getArgs
-  s   <- readFile $ args !! 0
+  s    <- readFile $ args !! 0
   let ast = Parser.parse s
   if ast == Nothing then putStrLn "Parse errors!"
-  else writeFile (args !! 1) (show ast)
+  else putStrLn . show $ run empty (fromMaybe Skip ast) (args !! 1)
