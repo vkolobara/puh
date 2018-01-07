@@ -1,0 +1,23 @@
+HOMEWORK
+
+TASK 1
+move function has non-exhaustive patterns. You should output an error message or do nothing if a wrong command is present.
+
+If you had written move as:
+move :: Robot -> Char -> Robot,
+the simulate function could simply be:
+simulate = foldl move
+
+TASK 2
+Maybe the code would be more readable with guards.
+
+TASK 4
+It is actually possible to make splitter work on infinite lists.
+
+Here is my foldr function:
+
+f x acc = if sublst `isPrefixOf` (x:curr) then []:drop len (x:curr):rest else (x:curr):rest
+
+curr = current part, rest = following parts, len = length sublst
+
+If we find the sublist as the prefix of our current part, then we need to split there and create a new empty part, else we just do another iteration where we prepend current element to the current part.

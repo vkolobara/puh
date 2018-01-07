@@ -1,0 +1,9 @@
+TASK 1
+
+decideAndExecute has non-exhaustive patterns. An error should be thrown if I try to execute an illegal command.
+
+You could have made decideAndExecute like:
+decideAndExecute :: Robot -> Char -> Robot
+
+Then the simulate could be:
+simulate = foldl decideAndExecute
