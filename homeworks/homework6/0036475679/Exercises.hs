@@ -18,6 +18,23 @@ module Exercises where
 
 {-LECTURE 10-} -- http://www.fer.unizg.hr/_download/repository/puh-2016-lecture-10.lhs
 
+data Sex = Male | Female deriving (Show,Read,Eq,Ord)
+
+data Person2 = Person2 {
+  personId2 :: String,
+  forename2 :: String,
+  surname2  :: String,
+  sex2      :: Sex,
+  mother2   :: Maybe Person2,
+  father2   :: Maybe Person2,
+  partner2  :: Maybe Person2,
+  children2 :: [Person2] } deriving (Show,Read,Eq,Ord)
+
+john = Person2 "123" "John" "Doe" Male Nothing Nothing (Just jane) []
+jane = Person2 "623" "Jane" "Fox" Female (Just ann) Nothing (Just john) []
+ann  = Person2 "343" "Ann"  "Doe" Female Nothing Nothing Nothing [jane]
+
+
 -- EXERCISE 01 =======================================================================
 {-
   1.2.
@@ -27,8 +44,13 @@ module Exercises where
 -}
 
 parentCheck :: Person2 -> Bool
-parentCheck = undefined
+parentCheck pers = isChild pers mother && isChild pers father
+  where mother = mother2 pers
+        father = father2 pers
 
+isChild :: Person2 -> Maybe Person2 -> Bool
+isChild pers1 (Just pers2) = personId2 pers1 `elem` (map personId2 . children2) pers2
+isChild pers1 Nothing = False
 {-
   1.3.
   - Define a function
@@ -37,7 +59,16 @@ parentCheck = undefined
 -}
 
 sister :: Person2 -> Maybe Person2
-sister = undefined
+sister pers = if null children then Nothing else Just (head children)
+  where mother    = mother2 pers
+        father    = father2 pers
+        mChildren = findFemaleChildren mother
+        fChildren = findFemaleChildren father
+        children  = mChildren ++ fChildren
+
+findFemaleChildren :: Maybe Person2 -> [Person2]
+findFemaleChildren Nothing     = []
+findFemaleChildren (Just pers) = filter (\p -> sex2 p == Female) . children2 $ pers
 
 {-
   1.4.
@@ -46,7 +77,13 @@ sister = undefined
 -}
 
 descendant :: Person2 -> [Person2]
-descendant = undefined
+descendant = descendant' []
+
+descendant' :: [String] -> Person2 -> [Person2]
+descendant' visited p = if elem id visited || null ch then [] else ch ++ concatMap (descendant' nv) ch
+  where id = personId2 p
+        ch = children2 p
+        nv = id:visited
 
 -- EXERCISE 02 =======================================================================
 {-
@@ -54,10 +91,12 @@ descendant = undefined
   - Define
     listHead :: MyList a -> Maybe a
 -}
+data MyList a = Empty | Cons a (MyList a) deriving (Show,Read,Ord)
+
 
 listHead :: MyList a -> Maybe a
-listHead = undefined
-
+listHead Empty      = Nothing
+listHead (Cons h _) = Just h
 {-
   2.2.
   - Define a function that works like 'map' but works on a 'MyList' type:
@@ -65,7 +104,8 @@ listHead = undefined
 -}
 
 listMap :: (a -> b) -> MyList a -> MyList b
-listMap = undefined
+listMap f Empty        = Empty
+listMap f (Cons a lst) = Cons (f a) (listMap f lst)
 
 -- EXERCISE 03 =======================================================================
 {-
@@ -75,9 +115,14 @@ listMap = undefined
     that finds the maximum element in a tree. Return an error if the tree is
     empty.
 -}
+data Tree a = Null | Node a (Tree a) (Tree a) deriving (Show)
 
 treeMax :: Ord a => Tree a -> a
-treeMax = undefined
+treeMax Null                = error "empty tree"
+treeMax (Node x Null Null)  = x
+treeMax (Node x left Null)  = x `max` treeMax left
+treeMax (Node x Null right) = x `max` treeMax right
+treeMax (Node x left right) = max (treeMax left) (treeMax right)
 
 {-
   3.2.
@@ -88,7 +133,8 @@ treeMax = undefined
 -}
 
 treeToList :: Ord a => Tree a -> [a]
-treeToList = undefined
+treeToList Null                = []
+treeToList (Node x left right) = treeToList left ++ [x] ++ treeToList right
 
 {-
   3.3.
@@ -97,7 +143,9 @@ treeToList = undefined
 -}
 
 levelCut :: Int -> Tree a -> Tree a
-levelCut = undefined
+levelCut _ Null                = Null
+levelCut 0 (Node x left right) = Node x Null Null
+levelCut i (Node x left right) = Node x (levelCut (i-1) left) (levelCut (i-1) right)
 
 -- EXERCISE 04 =======================================================================
 {-
@@ -107,17 +155,17 @@ levelCut = undefined
 -}
 
 listToTree :: Ord a => [a] -> Tree a
-listToTree = undefined
+listToTree = foldl (flip treeInsert) Null
 
 {-
   4.2.
-  - Using 'listToTree' and 'treeToList' defined previously, define these two 
+  - Using 'listToTree' and 'treeToList' defined previously, define these two
     functions, define:
     sortAndNub :: Ord a => [a] -> [a]
 -}
 
 sortAndNub :: Ord a => [a] -> [a]
-sortAndNub = undefined
+sortAndNub = treeToList . listToTree
 
 -- EXERCISE 05 =======================================================================
 {-
@@ -126,10 +174,18 @@ sortAndNub = undefined
     that two Fridays are never identical.
 -}
 
-data Weekday = 
+data Weekday =
   Monday | Tuesday | Wednesday | Thursday | Friday | Saturday | Sunday
   deriving (Show,Enum)
 
+instance Eq Weekday where
+  Monday    == Monday    = True
+  Tuesday   == Tuesday   = True
+  Wednesday == Wednesday = True
+  Thursday  == Thursday  = True
+  Saturday  == Saturday  = True
+  Sunday    == Sunday    = True
+  _         == _         = False
 {-
   5.2.
   - Define 'Person' as an instance of 'Show' type class so that instead of the
@@ -145,7 +201,17 @@ data Person = Person
   , age      :: Int
   , partner  :: Maybe Person
   , children :: [Person]
-  } deriving (Show,Read,Ord)
+  } deriving (Eq,Read,Ord)
+
+instance Show Person where
+  show (Person id fn sn sx ag prt chldr) =
+    id ++ "," ++
+    fn ++ "," ++
+    sn ++ "," ++
+    show sx ++ "," ++
+    show ag ++ "," ++
+    show (fmap forename prt) ++ "," ++
+    show (map forename chldr)
 
 
 {-LECTURE 11-} -- http://www.fer.unizg.hr/_download/repository/puh-2016-lecture-11.lhs
@@ -283,7 +349,7 @@ wc :: FilePath -> IO (Int, Int, Int)
 wc = undefined
 
 {-
-  5.2. 
+  5.2.
   - Define a function
     copyLines :: [Int] -> FilePath -> FilePath -> IO ()
     that copies given lines from the first file into the second.
@@ -305,10 +371,10 @@ wordTypes = undefined
 
 {-
   6.2.
-  - Define a function 
+  - Define a function
       diff :: FilePath -> FilePath -> IO ()
     that takes two file names, compares their corresponding lines, and then
-    outputs to standard output all lines in which the files differ. Lines should 
+    outputs to standard output all lines in which the files differ. Lines should
     be printed one below the other, prefixed with "<" for the first and ">" for
     the second file.
 -}
@@ -319,12 +385,12 @@ diff = undefined
 {-
   6.3.
   - Define a function
-      removeSpaces :: FilePath -> IO () 
+      removeSpaces :: FilePath -> IO ()
     that removes trailing spaces from all lines in the given file.
     The function should change the original file.
 -}
 
-removeSpaces :: FilePath -> IO () 
+removeSpaces :: FilePath -> IO ()
 removeSpaces = undefined
 
 -- EXERCISE 07 =======================================================================

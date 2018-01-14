@@ -1,6 +1,7 @@
 module Homework where
 --
 import           Data.List
+import           Data.List.Split
 import           Data.Time.Calendar (Day, fromGregorian, gregorianMonthLength)
 import           Data.Time.Clock    (UTCTime (..))
 import           Data.Time.Format   (defaultTimeLocale, formatTime)
@@ -123,13 +124,50 @@ levelMap f tree = levelMap' tree 0
         levelMap' Leaf _                      = Leaf
 -- c)
 isSubtree :: Eq a => Tree a -> Tree a -> Bool
-isSubtree = undefined
+isSubtree sbtree@(Node v1 l1 r1) (Node v l r) = if v1 == v then
+                                                     checkEqual l1 l && checkEqual r1 r
+                                                else isSubtree sbtree l || isSubtree sbtree r
+isSubtree Leaf                    _           = True
+isSubtree _                       _           = False
+
+checkEqual :: Eq a => Tree a -> Tree a -> Bool
+checkEqual (Node v1 l1 r1) (Node v2 l2 r2) = v1 == v2 && checkEqual l1 l2 && checkEqual r1 r2
+checkEqual Node{}          Leaf   = False
+checkEqual Leaf            Node{} = False
+checkEqual Leaf            Leaf   = True
 
 -- Task 04
-data Category
+data Category = Category {name  :: String,
+                          chldr :: [Category]}
+                deriving (Show)
+
+
+instance Eq Category where
+  (Category n1 _) == (Category n2 _) = n1 == n2
 
 parseCategories :: [String] -> [Category]
-parseCategories = undefined
+parseCategories xs = parseCategories' xs []
+
+parseCategories' :: [String] -> [Category] -> [Category]
+parseCategories' [] acc     = acc
+parseCategories' (x:xs) acc = acc
+  where splitted      = splitOn " > " x
+        catLst        = undefined
+
+
+
+addCategory :: Category -> [Category] -> [Category]
+addCategory cat cats
+  | ind == Nothing = cat : cats
+  | otherwise      = cats
+  where ind = elemIndex cat cats
+
+addChildCategory :: Category -> Category -> [Category] -> [Category]
+addChildCategory child par cats = parent : delete cat cats
+  where (Just ind)             = elemIndex par cats
+        cat@(Category s chldr) = cats !! ind
+        parent                 = Category s (child : chldr)
+
 
 printCategories :: [Category] -> [String]
 printCategories = undefined
