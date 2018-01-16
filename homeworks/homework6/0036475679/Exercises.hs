@@ -1,6 +1,16 @@
 {-# LANGUAGE NoMonomorphismRestriction #-}
 --
 module Exercises where
+
+import           Control.Monad      (forM_, replicateM, when)
+import           Data.Char          (isDigit)
+import qualified Data.Set           as Set
+import           System.Directory
+import           System.Environment
+import           System.FilePath
+import           System.IO
+import           System.IO.Error
+
 --
 
 {-
@@ -91,7 +101,7 @@ descendant' visited p = if elem id visited || null ch then [] else ch ++ concatM
   - Define
     listHead :: MyList a -> Maybe a
 -}
-data MyList a = Empty | Cons a (MyList a) deriving (Show,Read,Ord)
+data MyList a = Empty | Cons a (MyList a) deriving (Show,Read)
 
 
 listHead :: MyList a -> Maybe a
@@ -146,6 +156,13 @@ levelCut :: Int -> Tree a -> Tree a
 levelCut _ Null                = Null
 levelCut 0 (Node x left right) = Node x Null Null
 levelCut i (Node x left right) = Node x (levelCut (i-1) left) (levelCut (i-1) right)
+
+treeInsert :: Ord a => a -> Tree a -> Tree a
+treeInsert x Null = Node x Null Null
+treeInsert x t@(Node y l r)
+  | x < y     = Node y (treeInsert x l) r
+  | x > y     = Node y l (treeInsert x r)
+  | otherwise = t
 
 -- EXERCISE 04 =======================================================================
 {-
@@ -226,7 +243,10 @@ instance Show Person where
     concatenated and reversed.
 -}
 
-main = undefined
+main = do
+  x <- getLine
+  y <- getLine
+  putStrLn . reverse $ x++y
 
 {-
   1.2.
@@ -234,7 +254,11 @@ main = undefined
     their sum.
 -}
 
-threeNumbers = undefined
+threeNumbers = do
+  x <- getLine
+  y <- getLine
+  z <- getLine
+  print $ (read x :: Int) + (read y :: Int) + (read z :: Int)
 
 -- EXERCISE 02 =======================================================================
 {-
@@ -244,8 +268,19 @@ threeNumbers = undefined
     treeStrings :: IO Int
 -}
 
+-- Typo maybe ???
 treeStrings :: IO Int
-treeStrings = undefined
+treeStrings = threeStrings
+
+
+threeStrings :: IO Int
+threeStrings = do
+  s1 <- getLine
+  s2 <- getLine
+  s3 <- getLine
+  let s  = s1++s2++s3
+  putStrLn s
+  return $ length s
 
 {-
   2.2.
@@ -256,7 +291,12 @@ treeStrings = undefined
 -}
 
 askNumber9 :: IO Int
-askNumber9 = undefined
+askNumber9 = do
+  number <- getLine
+  if checkDigits number then return $ read number else askNumber9
+
+checkDigits :: String -> Bool
+checkDigits = all isDigit
 
 {-
   2.3.
@@ -269,10 +309,18 @@ askNumber9 = undefined
 -}
 
 askUser :: String -> (String -> Bool) -> IO String
-askUser = undefined
+askUser m p = do
+  print m
+  s <- getLine
+  if p s then askUser m p
+  else return s
 
 askUser' :: Read a => String -> (String -> Bool) -> IO a
-askUser' = undefined
+askUser' m p = do
+  print m
+  s <- getLine
+  if p s then askUser' m p
+  else return (read s)
 
 {-
   2.4.
@@ -282,7 +330,12 @@ askUser' = undefined
 -}
 
 inputStrings :: IO [String]
-inputStrings = undefined
+inputStrings = inputStrings' []
+inputStrings' :: [String] -> IO [String]
+inputStrings' xs = do
+  s <- getLine
+  if s == "" then return xs
+  else inputStrings' (s:xs)
 
 -- EXERCISE 03 =======================================================================
 {-
@@ -290,22 +343,63 @@ inputStrings = undefined
   - Define a function that reads in a number, then reads in that many
     strings, and finally prints these strings in reverse order.
 -}
+f1 :: IO ()
+f1 = do
+  num <- getLine
+  xs <- replicateM (read num) getLine
+  mapM_ print (reverse xs)
+
 
 {-
   3.2.
   - Give recursive definitions for 'sequence' and 'sequence_'.
 -}
 
+sequence1 :: Monad m => [m a] -> m [a]
+sequence1 xs = sequence1' xs []
+
+sequence1' :: Monad m => [m a] -> [a] -> m [a]
+sequence1' []     acc = return acc
+sequence1' (x:xs) acc = do
+  val <- x
+  sequence1' xs (val:acc)
+
+sequence1_ :: Monad m => [m a] -> m ()
+sequence1_ xs = do
+  sequence1 xs
+  return ()
+
 {-
   3.3.
   - Give a recursive definitions for 'mapM' and 'mapM_'.
 -}
+
+mapM1 :: Monad m => (a -> m b) -> [a] -> m [b]
+mapM1 f xs = mapM1' f xs []
+
+mapM1' :: Monad m => (a -> m b) -> [a] -> [b] -> m [b]
+mapM1' _ []     acc = return acc
+mapM1' f (x:xs) acc = do
+  val <- f x
+  mapM1' f xs (val : acc)
+
+mapM1_ :: Monad m => (a -> m b) -> [a] -> m ()
+mapM1_ f xs = do
+  mapM1 f xs
+  return ()
 
 {-
   3.4.
   - Define a function that prints out the Pythagorean triplets whose all sides
     are <=100. Every triplet should be in a separate line.
 -}
+
+printPythagoreanTriplets :: IO()
+printPythagoreanTriplets =
+  forM_ [1..100] $ \x ->
+    forM_ [x..100] $ \y ->
+      forM_ [y..100] $ \z ->
+        when (x * x + y * y == z * z) $ print (x, y, z)
 
 -- EXERCISE 04 =======================================================================
 {-
@@ -316,7 +410,9 @@ inputStrings = undefined
 -}
 
 filterOdd :: IO ()
-filterOdd = undefined
+filterOdd = do
+  s <- getContents
+  putStrLn . unlines . map snd . filter (\(x,y) -> even x) $ zip [0..] (lines s)
 
 {-
   4.2.
@@ -326,7 +422,9 @@ filterOdd = undefined
 -}
 
 numberLines :: IO ()
-numberLines = undefined
+numberLines = do
+  s <- getContents
+  putStrLn . unlines . map (\(x,y) -> show x ++ ' ':y) $ zip [0..] (lines s)
 
 {- 4.3.
   - Define a function to remove from standard input all words from a given set of
@@ -334,8 +432,10 @@ numberLines = undefined
       filterWords :: Set String -> IO ()
 -}
 
-filterWords :: Set String -> IO ()
-filterWords = undefined
+filterWords :: Set.Set String -> IO ()
+filterWords set = do
+  s <- getContents
+  putStrLn . unwords . filter (`Set.member` set) . words $ s
 
 -- EXERCISE 05 =======================================================================
 {-
@@ -346,7 +446,13 @@ filterWords = undefined
 -}
 
 wc :: FilePath -> IO (Int, Int, Int)
-wc = undefined
+wc f = do
+  h <- openFile f ReadMode
+  s <- hGetContents h
+  let chrs = length s
+  let wrds = length . words $ s
+  let lns = length . lines $ s
+  return (chrs, wrds, lns)
 
 {-
   5.2.
@@ -356,7 +462,13 @@ wc = undefined
 -}
 
 copyLines :: [Int] -> FilePath -> FilePath -> IO ()
-copyLines = undefined
+copyLines lineNumbers rf wf = do
+  rh <- openFile rf ReadMode
+  rs <- hGetContents rh
+  wh <- openFile wf WriteMode
+  let linesRs = lines rs
+  mapM_ (\ix -> hPutStrLn wh ( linesRs !! ix)) lineNumbers
+
 
 -- EXERCISE 06 =======================================================================
 {-
@@ -428,9 +540,8 @@ sortFiles = undefined
   - Define your own implementation of
       randoms' :: (RandomGen g, Random a) => g -> [a]
 -}
-
-randoms' :: (RandomGen g, Random a) => g -> [a]
-randoms' = undefined
+--randoms' :: (RandomGen g, Random a) => g -> [a]
+--randoms' = undefined
 
 {-
   8.2.
