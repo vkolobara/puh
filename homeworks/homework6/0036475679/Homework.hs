@@ -146,28 +146,17 @@ instance Eq Category where
   (Category n1 _) == (Category n2 _) = n1 == n2
 
 parseCategories :: [String] -> [Category]
-parseCategories xs = parseCategories' xs []
+parseCategories = undefined
 
-parseCategories' :: [String] -> [Category] -> [Category]
-parseCategories' [] acc     = acc
-parseCategories' (x:xs) acc = acc
-  where splitted      = splitOn " > " x
-        catLst        = undefined
+parseCategoryHierarchy :: String -> [Category]
+parseCategoryHierarchy  s = parseCategory (Category x []) xs
+  where (x:xs)     = splitOn " > " s
 
-
-
-addCategory :: Category -> [Category] -> [Category]
-addCategory cat cats
-  | ind == Nothing = cat : cats
-  | otherwise      = cats
-  where ind = elemIndex cat cats
-
-addChildCategory :: Category -> Category -> [Category] -> [Category]
-addChildCategory child par cats = parent : delete cat cats
-  where (Just ind)             = elemIndex par cats
-        cat@(Category s chldr) = cats !! ind
-        parent                 = Category s (child : chldr)
-
+parseCategory :: Category -> [String] -> [Category]
+parseCategory cat []                 = [cat]
+parseCategory cat@(Category nam chldr) (x:xs) = categ : parseCategory newCat xs
+  where categ  = Category nam (newCat : chldr)
+        newCat = Category x []
 
 printCategories :: [Category] -> [String]
 printCategories = undefined
