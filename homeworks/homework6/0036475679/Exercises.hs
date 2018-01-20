@@ -10,6 +10,7 @@ import           System.Environment
 import           System.FilePath
 import           System.IO
 import           System.IO.Error
+import           System.Random
 
 --
 
@@ -468,89 +469,3 @@ copyLines lineNumbers rf wf = do
   wh <- openFile wf WriteMode
   let linesRs = lines rs
   mapM_ (\ix -> hPutStrLn wh ( linesRs !! ix)) lineNumbers
-
-
--- EXERCISE 06 =======================================================================
-{-
-  6.1.
-  - Define a function
-      wordTypes :: FilePath -> IO Int
-    to compute the number of distinct words in the given file.
--}
-
-wordTypes :: FilePath -> IO Int
-wordTypes = undefined
-
-{-
-  6.2.
-  - Define a function
-      diff :: FilePath -> FilePath -> IO ()
-    that takes two file names, compares their corresponding lines, and then
-    outputs to standard output all lines in which the files differ. Lines should
-    be printed one below the other, prefixed with "<" for the first and ">" for
-    the second file.
--}
-
-diff :: FilePath -> FilePath -> IO ()
-diff = undefined
-
-{-
-  6.3.
-  - Define a function
-      removeSpaces :: FilePath -> IO ()
-    that removes trailing spaces from all lines in the given file.
-    The function should change the original file.
--}
-
-removeSpaces :: FilePath -> IO ()
-removeSpaces = undefined
-
--- EXERCISE 07 =======================================================================
-{-
-  7.1.
-  - Define a function
-      fileHead :: IO ()
-    that prints the first 'n' lines from a file. The name of the file and the
-    number of lines are specified at the command line, e.g.:
-      filehead -5 input.txt
-    If the number of lines is missing, default to 10. If file name is missing,
-    read from the standard input. If the file doesn't exist, print an error
-    message and exit with failure using 'exitFailure' from 'System.Exit'.
--}
-
-fileHead :: IO ()
-fileHead = undefined
-
-{-
-  7.2.
-  - Define a function
-      sortFiles :: IO ()
-    that sorts lines from multiple files and prints them to standard output.
-    File names are provided at the command line.
-    "sortFiles file1.txt file2.txt file3.txt"
-    If any of the files does not exist, print an error message.
--}
-
-sortFiles :: IO ()
-sortFiles = undefined
-
--- EXERCISE 08 =======================================================================
-{-
-  8.1.
-  - Define your own implementation of
-      randoms' :: (RandomGen g, Random a) => g -> [a]
--}
---randoms' :: (RandomGen g, Random a) => g -> [a]
---randoms' = undefined
-
-{-
-  8.2.
-  - Define a function
-      randomPositions :: Int -> Int -> Int -> Int -> IO [(Int,Int)]
-    that returns a list of randomly generated integer coordinates from within a
-    given interval.
-      randomPositions 0 10 0 10 => [(2,1),(4,3),(7,7),...
--}
-
-randomPositions :: Int -> Int -> Int -> Int -> IO [(Int,Int)]
-randomPositions = undefined
